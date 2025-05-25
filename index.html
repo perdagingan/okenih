@@ -1,183 +1,683 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-    <meta charset="UTF-T">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulir Identitas Diri</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>VLC Mobile Player</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        /* Custom scrollbar (optional, for better aesthetics) */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            touch-action: manipulation;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
+
+        .vlc-header {
+            background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(255, 102, 0, 0.3);
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
+
+        .vlc-logo {
+            width: 32px;
+            height: 32px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
         }
-        /* Styling untuk input date agar placeholder terlihat */
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            opacity: 0.5;
+
+        .vlc-logo::before {
+            content: "▶";
+            color: #ff6600;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .vlc-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .player-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 100%;
+            margin: 0 auto;
+            background: #222;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-container {
+            position: relative;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            flex: 1;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .video-placeholder {
+            text-align: center;
+            color: #888;
+            padding: 40px 20px;
+        }
+
+        .video-placeholder i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #ff6600;
+        }
+
+        .media-info {
+            background: linear-gradient(180deg, #333 0%, #2a2a2a 100%);
+            padding: 12px 16px;
+            border-bottom: 1px solid #444;
+        }
+
+        .media-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ff6600;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .media-meta {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 4px;
+        }
+
+        .progress-section {
+            background: #2a2a2a;
+            padding: 16px;
+            border-bottom: 1px solid #444;
+        }
+
+        .progress-container {
+            position: relative;
+            width: 100%;
+            height: 6px;
+            background: #444;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            touch-action: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6600 0%, #ff8533 100%);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        .progress-thumb {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            background: #ff6600;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .progress-container:hover .progress-thumb,
+        .progress-container:active .progress-thumb {
+            opacity: 1;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .controls {
+            background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .main-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
+            min-height: 48px;
+            touch-action: manipulation;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 102, 0, 0.2);
+        }
+
+        .control-btn.play-pause {
+            background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%);
+            color: white;
+            font-size: 20px;
+            min-width: 56px;
+            min-height: 56px;
+        }
+
+        .control-btn.play-pause:hover {
+            background: linear-gradient(135deg, #ff8533 0%, #ffaa66 100%);
+            transform: scale(1.08);
+        }
+
+        .secondary-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            max-width: 120px;
+        }
+
+        .volume-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            padding: 8px;
+            font-size: 16px;
+            min-width: 32px;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 4px;
+            background: #444;
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #ff6600;
+            border-radius: 50%;
             cursor: pointer;
         }
-        input[type="date"]:required:invalid::-webkit-datetime-edit {
-            color: transparent;
+
+        .volume-slider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            background: #ff6600;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
         }
-        input[type="date"]:focus::-webkit-datetime-edit {
-            color: black !important;
+
+        .file-section {
+            background: #1a1a1a;
+            padding: 20px 16px;
+            text-align: center;
+            border-top: 1px solid #444;
+        }
+
+        .file-input-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+        }
+
+        .file-input-label:hover {
+            background: linear-gradient(135deg, #ff8533 0%, #ffaa66 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
+        }
+
+        .file-input-label:active {
+            transform: translateY(0);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .main-controls {
+                gap: 20px;
+            }
+            
+            .control-btn {
+                min-width: 44px;
+                min-height: 44px;
+                padding: 10px;
+            }
+            
+            .control-btn.play-pause {
+                min-width: 52px;
+                min-height: 52px;
+            }
+            
+            video {
+                max-height: 60vh;
+            }
+            
+            .vlc-title {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .progress-section {
+                padding: 12px;
+            }
+            
+            .controls {
+                padding: 16px 12px;
+            }
+            
+            .main-controls {
+                gap: 16px;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #ff6600;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="bg-gray-100 font-sans antialiased">
-    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+<body>
+    <div class="vlc-header">
+        <div class="vlc-logo"></div>
+        <div class="vlc-title">VLC Mobile Player</div>
+    </div>
 
-        <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold text-gray-800">Formulir Identitas Diri</h1>
-            <p class="text-gray-600">Silakan lengkapi data diri Anda dengan benar.</p>
-        </header>
-
-        <div class="flex flex-col lg:flex-row gap-8">
-            <aside class="lg:w-1/4 bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-xl font-semibold text-gray-700 mb-4">Navigasi</h2>
-                <nav>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="block px-4 py-2 text-blue-600 bg-blue-50 rounded-md font-medium">Info Pribadi</a></li>
-                        <li><a href="#" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">Info Kontak</a></li>
-                        <li><a href="#" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">Pendidikan</a></li>
-                        <li><a href="#" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">Pekerjaan</a></li>
-                    </ul>
-                </nav>
-                <div class="mt-8 border-t pt-4">
-                    <p class="text-sm text-gray-500">Pastikan semua data terisi sebelum melanjutkan.</p>
-                </div>
-            </aside>
-
-            <main class="lg:w-3/4 bg-white p-6 sm:p-8 rounded-lg shadow-lg">
-                <form action="#" method="POST">
-                    <div class="space-y-6">
-                        <section>
-                            <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Informasi Pribadi</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                                    <input type="text" name="nama_lengkap" id="nama_lengkap" placeholder="Masukkan nama lengkap Anda" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
-                                </div>
-
-                                <div>
-                                    <label for="tanggal_lahir" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir</label>
-                                    <input type="date" name="tanggal_lahir" id="tanggal_lahir" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-gray-500" required onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
-                                    <p class="mt-1 text-xs text-gray-500">Usia akan dihitung otomatis.</p>
-                                </div>
-
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Kelamin</label>
-                                    <div class="mt-2 space-y-2 sm:space-y-0 sm:flex sm:space-x-6">
-                                        <div class="flex items-center">
-                                            <input id="pria" name="jenis_kelamin" type="radio" value="pria" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
-                                            <label for="pria" class="ml-2 block text-sm text-gray-900">Pria</label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input id="wanita" name="jenis_kelamin" type="radio" value="wanita" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
-                                            <label for="wanita" class="ml-2 block text-sm text-gray-900">Wanita</label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input id="lainnya" name="jenis_kelamin" type="radio" value="lainnya" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
-                                            <label for="lainnya" class="ml-2 block text-sm text-gray-900">Lainnya</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-
-                        <section>
-                            <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Detail Identitas</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label for="jenis_identitas" class="block text-sm font-medium text-gray-700 mb-1">Jenis Identitas</label>
-                                    <select id="jenis_identitas" name="jenis_identitas" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
-                                        <option value="" disabled selected>Pilih jenis identitas</option>
-                                        <option value="ktp">KTP (Kartu Tanda Penduduk)</option>
-                                        <option value="sim">SIM (Surat Izin Mengemudi)</option>
-                                        <option value="paspor">Paspor</option>
-                                        <option value="kitas">KITAS (Kartu Izin Tinggal Terbatas)</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label for="nomor_identitas" class="block text-sm font-medium text-gray-700 mb-1">Nomor Identitas</label>
-                                    <input type="text" name="nomor_identitas" id="nomor_identitas" placeholder="Masukkan nomor identitas" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
-                                </div>
-                            </div>
-                        </section>
-
-                        <section>
-                            <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Alamat Sesuai Identitas</h3>
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label for="provinsi" class="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
-                                    <input type="text" name="provinsi" id="provinsi" placeholder="Ketik untuk mencari provinsi..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                    </div>
-
-                                <div>
-                                    <label for="kota_kabupaten" class="block text-sm font-medium text-gray-700 mb-1">Kota/Kabupaten</label>
-                                    <input type="text" name="kota_kabupaten" id="kota_kabupaten" placeholder="Ketik untuk mencari kota/kabupaten..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                     </div>
-
-                                 <div class="md:col-span-2">
-                                    <label for="alamat_lengkap" class="block text-sm font-medium text-gray-700 mb-1">Alamat Lengkap</label>
-                                    <textarea id="alamat_lengkap" name="alamat_lengkap" rows="3" placeholder="Contoh: Jl. Merdeka No. 10, RT 01/RW 02, Kel. Sukajadi, Kec. Sukasari" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
-                                </div>
-                             </div>
-                        </section>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end space-x-3">
-                        <button type="button" class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
-                            Batal
-                        </button>
-                        <button type="submit" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Simpan & Lanjutkan
-                        </button>
-                    </div>
-                </form>
-            </main>
+    <div class="player-container">
+        <div class="video-container">
+            <video id="mediaPlayer" preload="metadata" playsinline>
+                Your browser does not support the video tag.
+            </video>
+            <div id="videoPlaceholder" class="video-placeholder">
+                <i class="fas fa-play-circle"></i>
+                <div>Select a media file to play</div>
+            </div>
         </div>
 
-        <footer class="mt-12 text-center text-sm text-gray-500">
-            <p>&copy; <span id="currentYear"></span> Perusahaan Anda. Semua Hak Dilindungi.</p>
-        </footer>
+        <div id="mediaInfo" class="media-info" style="display: none;">
+            <div id="mediaTitle" class="media-title">No media selected</div>
+            <div id="mediaMeta" class="media-meta"></div>
+        </div>
+
+        <div class="progress-section">
+            <div id="progressContainer" class="progress-container">
+                <div id="progressBar" class="progress-bar"></div>
+                <div id="progressThumb" class="progress-thumb"></div>
+            </div>
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="main-controls">
+                <button id="rewindBtn" class="control-btn" title="Rewind 10s">
+                    <i class="fas fa-backward"></i>
+                </button>
+                <button id="playPauseBtn" class="control-btn play-pause" title="Play/Pause">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button id="forwardBtn" class="control-btn" title="Forward 10s">
+                    <i class="fas fa-forward"></i>
+                </button>
+            </div>
+
+            <div class="secondary-controls">
+                <div class="volume-control">
+                    <button id="muteBtn" class="volume-btn" title="Mute/Unmute">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1">
+                </div>
+                <button id="fullscreenBtn" class="control-btn" title="Fullscreen">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="file-section">
+            <label for="fileInput" class="file-input-label">
+                <i class="fas fa-folder-open"></i>
+                Choose Media File
+            </label>
+            <input type="file" id="fileInput" accept="video/*,audio/*">
+        </div>
     </div>
 
     <script>
-        // Script sederhana untuk menampilkan tahun saat ini di footer
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        const mediaPlayer = document.getElementById('mediaPlayer');
+        const videoPlaceholder = document.getElementById('videoPlaceholder');
+        const mediaInfo = document.getElementById('mediaInfo');
+        const mediaTitle = document.getElementById('mediaTitle');
+        const mediaMeta = document.getElementById('mediaMeta');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const rewindBtn = document.getElementById('rewindBtn');
+        const forwardBtn = document.getElementById('forwardBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressThumb = document.getElementById('progressThumb');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const durationDisplay = document.getElementById('duration');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const muteBtn = document.getElementById('muteBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const fileInput = document.getElementById('fileInput');
 
-        // Script untuk placeholder input tanggal
-        // Ini membantu agar placeholder terlihat sebelum pengguna memilih tanggal
-        const dateInput = document.getElementById('tanggal_lahir');
-        if (dateInput) {
-            dateInput.placeholder = "DD/MM/YYYY"; // Atur placeholder awal
-            dateInput.type = 'text'; // Tipe awal text agar placeholder terlihat
+        let isDragging = false;
+        let lastVolume = 1;
 
-            dateInput.addEventListener('focus', function() {
-                this.type = 'date'; // Ubah ke tipe date saat fokus
-                this.placeholder = ''; // Hapus placeholder saat fokus
-            });
-
-            dateInput.addEventListener('blur', function() {
-                if (!this.value) {
-                    this.type = 'text'; // Kembali ke tipe text jika kosong
-                    this.placeholder = "DD/MM/YYYY"; // Tampilkan lagi placeholder
-                }
-            });
+        // Format time helper
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            
+            if (hours > 0) {
+                return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
         }
+
+        // File size helper
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        // Play/Pause functionality
+        playPauseBtn.addEventListener('click', () => {
+            if (mediaPlayer.paused || mediaPlayer.ended) {
+                mediaPlayer.play();
+            } else {
+                mediaPlayer.pause();
+            }
+        });
+
+        // Update play/pause button icon
+        mediaPlayer.addEventListener('play', () => {
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        });
+
+        mediaPlayer.addEventListener('pause', () => {
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+        });
+
+        // Rewind and forward buttons
+        rewindBtn.addEventListener('click', () => {
+            mediaPlayer.currentTime = Math.max(0, mediaPlayer.currentTime - 10);
+        });
+
+        forwardBtn.addEventListener('click', () => {
+            mediaPlayer.currentTime = Math.min(mediaPlayer.duration, mediaPlayer.currentTime + 10);
+        });
+
+        // Progress bar functionality
+        mediaPlayer.addEventListener('timeupdate', () => {
+            if (!isDragging && mediaPlayer.duration) {
+                const percentage = (mediaPlayer.currentTime / mediaPlayer.duration) * 100;
+                progressBar.style.width = `${percentage}%`;
+                progressThumb.style.left = `${percentage}%`;
+            }
+            currentTimeDisplay.textContent = formatTime(mediaPlayer.currentTime);
+        });
+
+        mediaPlayer.addEventListener('loadedmetadata', () => {
+            durationDisplay.textContent = formatTime(mediaPlayer.duration);
+        });
+
+        // Progress bar seeking
+        progressContainer.addEventListener('click', (e) => {
+            if (!mediaPlayer.duration) return;
+            const rect = progressContainer.getBoundingClientRect();
+            const clickPosition = (e.clientX - rect.left) / rect.width;
+            mediaPlayer.currentTime = clickPosition * mediaPlayer.duration;
+        });
+
+        // Touch/drag support for progress bar
+        progressContainer.addEventListener('mousedown', startDrag);
+        progressContainer.addEventListener('touchstart', startDrag);
+
+        function startDrag(e) {
+            isDragging = true;
+            updateProgress(e);
+            document.addEventListener('mousemove', updateProgress);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchmove', updateProgress);
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function updateProgress(e) {
+            if (!isDragging || !mediaPlayer.duration) return;
+            e.preventDefault();
+            const rect = progressContainer.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const position = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+            mediaPlayer.currentTime = position * mediaPlayer.duration;
+        }
+
+        function endDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', updateProgress);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchmove', updateProgress);
+            document.removeEventListener('touchend', endDrag);
+        }
+
+        // Volume control
+        volumeSlider.addEventListener('input', (e) => {
+            mediaPlayer.volume = e.target.value;
+            updateVolumeIcon(e.target.value);
+        });
+
+        muteBtn.addEventListener('click', () => {
+            if (mediaPlayer.volume > 0) {
+                lastVolume = mediaPlayer.volume;
+                mediaPlayer.volume = 0;
+                volumeSlider.value = 0;
+            } else {
+                mediaPlayer.volume = lastVolume > 0 ? lastVolume : 0.5;
+                volumeSlider.value = mediaPlayer.volume;
+            }
+            updateVolumeIcon(mediaPlayer.volume);
+        });
+
+        function updateVolumeIcon(volume) {
+            if (volume == 0) {
+                muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            } else if (volume < 0.5) {
+                muteBtn.innerHTML = '<i class="fas fa-volume-down"></i>';
+            } else {
+                muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+            }
+        }
+
+        // Fullscreen functionality
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (mediaPlayer.requestFullscreen) {
+                    mediaPlayer.requestFullscreen();
+                } else if (mediaPlayer.webkitRequestFullscreen) {
+                    mediaPlayer.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+            } else {
+                fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+            }
+        });
+
+        // File input handling
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const fileURL = URL.createObjectURL(file);
+                mediaPlayer.src = fileURL;
+                mediaPlayer.style.display = 'block';
+                videoPlaceholder.style.display = 'none';
+                mediaInfo.style.display = 'block';
+                
+                // Update media info
+                mediaTitle.textContent = file.name;
+                mediaMeta.textContent = `${formatFileSize(file.size)} • ${file.type}`;
+                
+                // Reset UI
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                progressBar.style.width = '0%';
+                progressThumb.style.left = '0%';
+                currentTimeDisplay.textContent = '0:00';
+                durationDisplay.textContent = '0:00';
+                
+                mediaPlayer.load();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (mediaPlayer.src) {
+                switch(e.code) {
+                    case 'Space':
+                        e.preventDefault();
+                        playPauseBtn.click();
+                        break;
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        rewindBtn.click();
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        forwardBtn.click();
+                        break;
+                    case 'KeyM':
+                        e.preventDefault();
+                        muteBtn.click();
+                        break;
+                    case 'KeyF':
+                        e.preventDefault();
+                        fullscreenBtn.click();
+                        break;
+                }
+            }
+        });
+
+        // Initialize volume icon
+        updateVolumeIcon(mediaPlayer.volume);
+
+        // Prevent context menu on video
+        mediaPlayer.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // Handle media errors
+        mediaPlayer.addEventListener('error', (e) => {
+            console.error('Media error:', e);
+            alert('Error loading media file. Please try a different file.');
+        });
     </script>
 </body>
 </html>
